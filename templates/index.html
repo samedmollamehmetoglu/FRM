@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markowitz Portfolio Optimizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Markowitz Portfolio Optimizer</h1>
+        <div id="selected-stocks" class="mb-2"></div>
+        <form id="portfolio-form">
+            <div class="form-group">
+                <label for="start-date">Start Date:</label>
+                <input type="date" class="form-control" id="start-date" name="start-date">
+            </div>
+            <div class="form-group">
+                <label for="end-date">End Date:</label>
+                <input type="date" class="form-control" id="end-date" name="end-date">
+            </div>
+            <div class="form-group">
+                <label for="tickers">Select Stocks:</label>
+                <div class="input-group">
+                    <select id="tickers" name="tickers" class="form-control" multiple>
+                        <option value="AAPL">Apple (AAPL)</option>
+                        <option value="MSFT">Microsoft (MSFT)</option>
+                        <option value="GOOGL">Alphabet (GOOGL)</option>
+                        <option value="AMZN">Amazon (AMZN)</option>
+                        <option value="TSLA">Tesla (TSLA)</option>
+                        <!-- Add more stocks as needed -->
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="add-stock-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Optimize</button>
+        </form>
+        <div id="results" class="mt-5">
+            <h2>Optimal Portfolio</h2>
+            <p id="weights"></p>
+            <p id="return"></p>
+            <p id="risk"></p>
+            <p id="max-sharpe"></p>
+            <p id="min-volatility"></p>
+            <div id="efficient-frontier" style="width: 100%; height: 600px;"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
