@@ -159,7 +159,7 @@ def calculate_equal_distribution(returns, tickers):
     plt.figure(figsize=(10, 6))
     colors = plt.cm.plasma(np.linspace(0, 3, 20))
     for i in range(returns.shape[1]):
-        plt.plot(returns.iloc[:, i].cumsum(), tickers[i],color =colors[i])
+        plt.plot(returns.iloc[:, i].cumsum(), label = tickers[i],color =colors[i])
 
     plt.legend(loc='best')
     plt.title('Kumulierte Summe jeder Zeitreihe')
