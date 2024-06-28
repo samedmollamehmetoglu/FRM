@@ -74,12 +74,15 @@ def optimize():
         'weights': optimal_weights.tolist(),
         'return': optimal_return,
         'risk': optimal_risk,
+        'portfolios_risk': pf_sigmas.tolist(),  # Add simulated portfolios' risks
+        'portfolios_return': pf_mus.tolist(),   # Add simulated portfolios' returns
         'frontier_x': pf_sigmas.tolist(),
         'frontier_y': pf_mus.tolist(),
         'max_sharpe_ratio_return': max_sharpe_ratio_return,
         'max_sharpe_ratio_risk': max_sharpe_ratio_risk,
         'min_volatility_return': min_volatility_return,
         'min_volatility_risk': min_volatility_risk
+    }
     }
 
     return jsonify(response)
