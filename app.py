@@ -233,7 +233,7 @@ def optimize():
     # Fetch data from Yahoo Finance
     stock_data = yf.download(tickers, start=date_range[0], end=date_range[1])['Adj Close']
     returns = stock_data.pct_change().dropna()
-
+    
     calculate = calculate_optimal_portfolio(returns)
     print(calculate)
     return jsonify(calculate)
