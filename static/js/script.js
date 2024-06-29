@@ -1,47 +1,46 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const tickersDropdown = document.getElementById('tickers');
     const selectedStocksContainer = document.getElementById('selected-stocks');
-    const portfolioForm = document.getElementById('portfolio-form');
-    const showStocksBtn = document.getElementById('show-stocks-btn');
-    const optimizeBtn = document.getElementById('optimize-btn');
+    const tickersSelect = document.getElementById('tickers');
+    const addStockBtn = document.getElementById('add-stock-btn');
+    let selectedStocks = [];
+
+    addStockBtn.addEventListener('click', function() {
+        const selectedTicker = tickersSelect.value;
+        if (!selectedStocks.includes(selectedTicker) && selectedStocks.length < 10) { // Ensure no duplicates and max 10 stocks
+            selectedStocks.push(selectedTicker);
+            updateSelectedStocks();
+        }
+    });
 
     function updateSelectedStocks() {
-        const selectedOptions = Array.from(tickersDropdown.selectedOptions).map(option => option.value);
         selectedStocksContainer.innerHTML = '';
-
-        selectedOptions.forEach(stock => {
+        selectedStocks.forEach(stock => {
             const stockDiv = document.createElement('div');
-            stockDiv.classList.add('selected-stock', 'd-flex', 'justify-content-between', 'align-items-center', 'mb-2');
-            stockDiv.innerText = stock;
-
-            const removeBtn = document.createElement('button');
-            removeBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'ml-2');
-            removeBtn.innerHTML = '&times;';
-            removeBtn.addEventListener('click', function() {
-                const index = Array.from(tickersDropdown.options).findIndex(option => option.value === stock);
-                tickersDropdown.options[index].selected = false;
-                updateSelectedStocks();
-            });
-
-            stockDiv.appendChild(removeBtn);
+            stockDiv.classList.add('selected-stock');
+            stockDiv.innerHTML = `${stock} <span class="remove-stock" data-ticker="${stock}">&times;</span>`;
             selectedStocksContainer.appendChild(stockDiv);
         });
-
-        // Enable or disable buttons based on selected stocks count
-        const selectedStocksCount = selectedOptions.length;
-        showStocksBtn.disabled = selectedStocksCount < 4;
-        optimizeBtn.disabled = selectedStocksCount < 4;
     }
 
-    tickersDropdown.addEventListener('change', updateSelectedStocks);
+    selectedStocksContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('remove-stock')) {
+            const ticker = event.target.getAttribute('data-ticker');
+            selectedStocks = selectedStocks.filter(stock => stock !== ticker);
+            updateSelectedStocks();
+        }
+    });
 
-    portfolioForm.addEventListener('submit', function(event) {
+    document.getElementById('portfolio-form').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
-        const selectedStocks = Array.from(tickersDropdown.selectedOptions).map(option => option.value);
         const action = event.submitter.value;
+
+        if (selectedStocks.length < 4) {
+            alert('Please select at least 4 stocks.');
+            return;
+        }
 
         const efficientFrontierContainer = document.getElementById('efficient-frontier');
         efficientFrontierContainer.innerHTML = ''; // Clear the container
@@ -66,8 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('weights').innerText = `Weights: ${data.weights.join(', ')}`;
             document.getElementById('return').innerText = `Expected Return: ${data.return}`;
             document.getElementById('risk').innerText = `Risk (Standard Deviation): ${data.risk}`;
-            document.getElementById('max-sharpe').innerText = `Max Sharpe Ratio: ${data.max_sharpe_ratio_return} (Risk: ${data.max_sharpe_ratio_risk})`;
-            document.getElementById('min-volatility').innerText = `Min Volatility: ${data.min_volatility_return} (Risk: ${data.min_volatility_risk})`;
 
             if (action === 'show-stocks') {
                 fetch('/cumulative_sum', {
@@ -171,10 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => console.error('Error fetching portfolio table:', error));
             }
-        });
-
-        updateSelectedStocks();  // Update selected stocks and reattach event listeners
+        })
+        .catch(error => console.error('Error processing request:', error));
     });
-
-    updateSelectedStocks();  // Initial update and event listener attachment
 });
