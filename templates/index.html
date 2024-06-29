@@ -24,7 +24,7 @@
             <div class="form-group">
                 <label for="tickers">Select Stocks:</label>
                 <div class="input-group">
-                    <select id="tickers" name="tickers" class="form-control" multiple>
+                    <select id="tickers" name="tickers" class="form-control">
                         <option value="AAPL">Apple (AAPL)</option>
                         <option value="MSFT">Microsoft (MSFT)</option>
                         <option value="GOOGL">Alphabet (GOOGL)</option>
@@ -33,12 +33,12 @@
                         <!-- Add more stocks as needed -->
                     </select>
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="add-stock-btn"><i class="fas fa-plus"></i></button>
+                        <button class="btn btn-outline-secondary" type="button" id="add-stock-btn"><i class="fas fa-plus"></i> Add Stock</button>
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="show-stocks-btn" name="action" value="show-stocks">Show Stocks</button>
-            <button type="submit" class="btn btn-primary" id="optimize-btn" name="action" value="optimize">Optimize</button>
+            <button type="submit" class="btn btn-primary" id="show-stocks-btn" name="action" value="show-stocks" disabled>Show Stocks</button>
+            <button type="submit" class="btn btn-primary" id="optimize-btn" name="action" value="optimize" disabled>Optimize</button>
         </form>
         <div id="results" class="mt-5">
             <h2>Optimal Portfolio</h2>
