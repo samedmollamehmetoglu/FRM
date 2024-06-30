@@ -171,7 +171,6 @@ def get_efficient_frontier():
     date_range = data['date_range']
 
     stock_data = yf.download(tickers, start=date_range[0], end=date_range[1])['Adj Close']
-    stock_data = stock_data.ffill().bfill()  # Fill missing values
     returns = stock_data.pct_change().dropna()
     
     pf_mus, pf_sigmas = simulate_portfolios(returns, n_portfolios=3000)
@@ -206,7 +205,6 @@ def optimize():
     date_range = data['date_range']
 
     stock_data = yf.download(tickers, start=date_range[0], end=date_range[1])['Adj Close']
-    stock_data = stock_data.ffill().bfill()  # Fill missing values
     returns = stock_data.pct_change().dropna()
     
     calculate = calculate_optimal_portfolio(returns)
@@ -219,7 +217,6 @@ def equal():
     date_range = data['date_range']
 
     stock_data = yf.download(tickers, start=date_range[0], end=date_range[1])['Adj Close']
-    stock_data = stock_data.ffill().bfill()  # Fill missing values
     returns = stock_data.pct_change().dropna()
 
     calculate = calculate_equal_distribution(returns, tickers)
@@ -246,7 +243,6 @@ def get_portfolio_table():
     date_range = data['date_range']
 
     stock_data = yf.download(tickers, start=date_range[0], end=date_range[1])['Adj Close']
-    stock_data = stock_data.ffill().bfill()  # Fill missing values
     returns = stock_data.pct_change().dropna()
 
     max_sharpe = calculate_optimal_portfolio(returns)
@@ -263,4 +259,3 @@ def get_portfolio_table():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
