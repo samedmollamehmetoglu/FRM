@@ -37,10 +37,10 @@ def calculate_frontier(returns):
     pbar = np.matrix(returns.mean())
     
     optimal_mus = []
-    r_min = pbar.mean()
-    for i in range(50):
-        optimal_mus.append(r_min)
-        r_min += (pbar.mean() / 100)
+    r_min = pbar.min()
+    r_max = pbar.max()
+    for i in np.linspace(r_min, r_max, 50):
+        optimal_mus.append(i)
     
     P = opt.matrix(cov)
     q = opt.matrix(np.zeros((N, 1)))
@@ -50,9 +50,18 @@ def calculate_frontier(returns):
     
     opt.solvers.options['show_progress'] = False
     
-    optimal_weights = [solvers.qp(P, q, G, opt.matrix(np.concatenate((-np.ones((1, 1)) * mu, np.zeros((N, 1))), 0)), A, b)['x'] for mu in optimal_mus]
-    optimal_sigmas = [np.sqrt(np.matrix(w).T * cov.T.dot(np.matrix(w)))[0,0] for w in optimal_weights]
+    optimal_weights = []
+    optimal_sigmas = []
     
+    for mu in optimal_mus:
+        try:
+            h = opt.matrix(np.concatenate((np.array([-mu]), np.zeros(N))))
+            weights = solvers.qp(P, q, G, h, A, b)['x']
+            optimal_weights.append(weights)
+            optimal_sigmas.append(np.sqrt(np.matrix(weights).T * cov.T.dot(np.matrix(weights)))[0, 0])
+        except ValueError as e:
+            print(f"Optimization error for mu={mu}: {e}")
+
     return optimal_weights, optimal_mus, optimal_sigmas
 
 def calculate_optimal_portfolio(returns, risk_free_rate=0.0):
@@ -70,9 +79,14 @@ def calculate_optimal_portfolio(returns, risk_free_rate=0.0):
     
     solvers.options['show_progress'] = False
     
-    optimal_sharpe_result = solvers.qp(P, q, G, h, A, b)
-    optimal_weights = np.array(optimal_sharpe_result['x']).flatten()
+    def sharpe_ratio(weights):
+        return -((np.dot(weights.T, pbar) - risk_free_rate) / np.sqrt(np.dot(weights.T, np.dot(cov, weights))))
+
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bounds = tuple((0, 1) for asset in range(N))
+    result = minimize(sharpe_ratio, N * [1. / N,], method='SLSQP', bounds=bounds, constraints=constraints)
     
+    optimal_weights = result.x
     optimal_return = np.dot(optimal_weights.T, pbar).item()
     optimal_risk = np.sqrt(np.dot(optimal_weights.T, np.dot(cov, optimal_weights))).item()
     max_sharpe_ratio = (optimal_return - risk_free_rate) / optimal_risk
@@ -175,9 +189,23 @@ def get_efficient_frontier():
     
     pf_mus, pf_sigmas = simulate_portfolios(returns, n_portfolios=3000)
     optimal_weights, optimal_mus, optimal_sigmas = calculate_frontier(returns)
+    
+    max_sharpe_portfolio = calculate_optimal_portfolio(returns)
+    min_vol_portfolio = get_min_volatility_portfolio(returns)
+    max_return_portfolio = get_max_return_portfolio(returns)
+
+    # Debug: Print the calculated values
+    print("Max Sharpe Portfolio:", max_sharpe_portfolio)
+    print("Min Volatility Portfolio:", min_vol_portfolio)
+    print("Max Return Portfolio:", max_return_portfolio)
 
     plt.plot(pf_sigmas, pf_mus, 'o', markersize=5, label='Available Market Portfolio')
     plt.plot(optimal_sigmas, optimal_mus, 'y-o', color='orange', markersize=8, label='Efficient Frontier')
+
+    plt.scatter(min_vol_portfolio['risk'], min_vol_portfolio['return'], color='green', edgecolors='black', marker='o', s=100, label='Min Volatility',zorder=5)
+    plt.scatter(max_sharpe_portfolio['risk'], max_sharpe_portfolio['return'], color='purple', edgecolors='black', marker='o', s=100, label='Max Sharpe Ratio',zorder=5)
+    plt.scatter(max_return_portfolio['risk'], max_return_portfolio['return'], color='red', edgecolors='black', marker='o', s=100, label='Max Return',zorder=5)
+
     plt.xlabel('Expected Volatility')
     plt.ylabel('Expected Return')
     plt.title('Efficient Frontier and Available Portfolios')
