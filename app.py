@@ -163,15 +163,12 @@ def calculate_equal_distribution(returns, tickers):
     static = os.path.join(os.getcwd(), 'static')
     filename = os.path.join(static, 'cumulative_plot.png')
     plt.savefig(filename)
+    plt.close()
 
     return {
         'weights': weights.tolist(),
         'return': optimal_return,
-        'risk': optimal_risk,
-        'max_sharpe_ratio_return': max_sharpe_ratio,
-        'max_sharpe_ratio_risk': optimal_risk,
-        'min_volatility_return': min_volatility_return,
-        'min_volatility_risk': min_volatility_risk,
+        'risk': optimal_risk
     }
 
 @app.route('/')
@@ -193,11 +190,6 @@ def get_efficient_frontier():
     max_sharpe_portfolio = calculate_optimal_portfolio(returns)
     min_vol_portfolio = get_min_volatility_portfolio(returns)
     max_return_portfolio = get_max_return_portfolio(returns)
-
-    # Debug: Print the calculated values
-    print("Max Sharpe Portfolio:", max_sharpe_portfolio)
-    print("Min Volatility Portfolio:", min_vol_portfolio)
-    print("Max Return Portfolio:", max_return_portfolio)
 
     plt.plot(pf_sigmas, pf_mus, 'o', markersize=5, label='Available Market Portfolio')
     plt.plot(optimal_sigmas, optimal_mus, 'y-o', color='orange', markersize=8, label='Efficient Frontier')
@@ -221,8 +213,16 @@ def get_efficient_frontier():
     global efficient_frontier
     efficient_frontier = 'efficient_frontier.png'
 
+    normal_portfolio = calculate_equal_distribution(returns, tickers)
+
     if efficient_frontier:
-        return jsonify({"image_path": f"/static/{efficient_frontier}"}), 200
+        return jsonify({
+            "image_path": f"/static/{efficient_frontier}",
+            "normal_portfolio": normal_portfolio,
+            "max_sharpe": max_sharpe_portfolio,
+            "min_volatility": min_vol_portfolio,
+            "max_return": max_return_portfolio
+        }), 200
     else:
         return jsonify({"error": "No image available"}), 404
 
@@ -236,18 +236,6 @@ def optimize():
     returns = stock_data.pct_change().dropna()
     
     calculate = calculate_optimal_portfolio(returns)
-    return jsonify(calculate)
-
-@app.route('/equal', methods=['POST'])
-def equal():
-    data = request.get_json()
-    tickers = data['tickers']
-    date_range = data['date_range']
-
-    stock_data = yf.download(tickers, start=date_range[0], end=date_range[1])['Adj Close']
-    returns = stock_data.pct_change().dropna()
-
-    calculate = calculate_equal_distribution(returns, tickers)
     return jsonify(calculate)
 
 @app.route('/cumulative_sum', methods=['GET'])
@@ -276,11 +264,13 @@ def get_portfolio_table():
     max_sharpe = calculate_optimal_portfolio(returns)
     min_volatility = get_min_volatility_portfolio(returns)
     max_return = get_max_return_portfolio(returns)
+    normal_portfolio = calculate_equal_distribution(returns, tickers)
 
     result = {
         'max_sharpe': max_sharpe,
         'min_volatility': min_volatility,
-        'max_return': max_return
+        'max_return': max_return,
+        'normal_portfolio': normal_portfolio
     }
 
     return jsonify(result)

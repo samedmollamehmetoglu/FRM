@@ -95,3 +95,44 @@ select.form-control {
   height: 600px;
   object-fit: cover; /* Optional: zum Anpassen des Bildes an die Größe */
 }
+body {
+  background-color: #f8f9fa;
+}
+
+.container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow: auto;
+}
+
+.selected-stock {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+#selected-stocks {
+  margin-bottom: 20px;
+}
+
+#portfolio-table {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.img-thumbnail {
+  margin-bottom: 20px;
+}
+
+#efficient-frontier, #cumulative-plot {
+  width: 100%;
+  height: 600px;
+  margin-bottom: 20px;
+}
