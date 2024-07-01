@@ -46,7 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const action = event.submitter.value;
 
         const efficientFrontierContainer = document.getElementById('efficient-frontier');
+        const portfolioTableContainer = document.getElementById('portfolio-table');
         efficientFrontierContainer.innerHTML = '';
+        portfolioTableContainer.innerHTML = '';
 
         let url = '/optimize';
         if (action === 'show-stocks') {
@@ -65,12 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('weights').innerText = `Weights: ${data.weights.join(', ')}`;
-            document.getElementById('return').innerText = `Expected Return: ${data.return}`;
-            document.getElementById('risk').innerText = `Risk (Standard Deviation): ${data.risk}`;
-            document.getElementById('max-sharpe').innerText = `Max Sharpe Ratio: ${data.max_sharpe_ratio_return} (Risk: ${data.max_sharpe_ratio_risk})`;
-            document.getElementById('min-volatility').innerText = `Min Volatility: ${data.min_volatility_return} (Risk: ${data.min_volatility_risk})`;
-
             if (action === 'show-stocks') {
                 fetch('/cumulative_sum', {
                     method: 'GET'
