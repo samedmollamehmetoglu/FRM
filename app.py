@@ -139,7 +139,7 @@ def get_max_return_portfolio(returns):
         'risk': max_return_risk
     }
 
-def calculate_equal_distribution(returns, tickers):
+"""def calculate_equal_distribution(returns, tickers):
     N = returns.shape[1]
     weights = np.ones(N) / N
 
@@ -169,7 +169,37 @@ def calculate_equal_distribution(returns, tickers):
         'weights': weights.tolist(),
         'return': optimal_return,
         'risk': optimal_risk
+    }"""
+def calculate_equal_distribution(returns, tickers):
+    N = returns.shape[1]
+    weights = np.ones(N) / N
+
+    cov = np.cov(returns.T)
+    pbar = returns.mean().values.reshape(-1, 1)
+    optimal_return = np.dot(weights.T, pbar).item()
+    optimal_risk = np.sqrt(np.dot(weights.T, np.dot(cov, weights))).item()
+
+    plt.figure(figsize=(10, 6))
+    colors = plt.cm.plasma(np.linspace(0, 3, 20))
+    for i in range(returns.shape[1]):
+        cumulative_returns = returns.iloc[:, i].cumsum() * 100  # Convert to percentage
+        plt.plot(cumulative_returns, label=tickers[i], color=colors[i])
+
+    plt.legend(loc='best')
+    plt.title('Cumulative Sum of the Assets')
+    plt.ylabel('Cumulative Daily Returns (%)')  # Updated y-axis label
+    plt.xlabel('Time')
+    static = os.path.join(os.getcwd(), 'static')
+    filename = os.path.join(static, 'cumulative_plot.png')
+    plt.savefig(filename)
+    plt.close()
+
+    return {
+        'weights': weights.tolist(),
+        'return': optimal_return,
+        'risk': optimal_risk
     }
+
 
 @app.route('/')
 def index():

@@ -38,33 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
     portfolioForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const startDate = new Date(document.getElementById('start-date').value);
-        const endDate = new Date(document.getElementById('end-date').value);
-        const today = new Date();
-
-        if (startDate >= endDate) {
-            alert("Start date must be before the end date.");
-            return;
-        }
-
-        if ((endDate - startDate) / (1000 * 60 * 60 * 24 * 365) < 1) {
-            alert("The date range must be at least one year.");
-            return;
-        }
-
-        if (endDate > today || startDate > today) {
-            alert("Dates cannot be in the future.");
-            return;
-        }
-
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
         const selectedStocks = Array.from(selectedStocksContainer.querySelectorAll('.selected-stock')).map(stock => stock.textContent.replace(' x', '').trim().match(/\(([^)]+)\)/)[1]);
 
         const efficientFrontierContainer = document.getElementById('efficient-frontier');
         const portfolioTableContainer = document.getElementById('portfolio-table');
         const cumulativePlotContainer = document.getElementById('cumulative-plot');
+        const disclaimerContainer = document.getElementById('disclaimer');
         efficientFrontierContainer.innerHTML = '';
         portfolioTableContainer.innerHTML = '';
         cumulativePlotContainer.innerHTML = '';
+        disclaimerContainer.innerHTML = '';
 
         fetch('/efficient_frontier', {
             method: 'POST',
@@ -73,16 +58,11 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 tickers: selectedStocks,
-                date_range: [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]]
+                date_range: [startDate, endDate]
             })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                alert(data.error);
-                return;
-            }
-
             const imgElement = document.createElement('img');
             imgElement.src = data.image_path;
             imgElement.alt = 'Efficient Frontier';
@@ -150,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 imgElement.style.width = '100%';
                 cumulativePlotContainer.innerHTML = '';
                 cumulativePlotContainer.appendChild(imgElement);
+
+                disclaimerContainer.innerHTML = '<p><strong>Disclaimer:</strong> The Markowitz portfolio optimization is based on historical data and assumes that past performance is indicative of future results. This method also assumes that asset returns are normally distributed, which might not always be the case in real market conditions. Investors should use these results with caution and consider other factors before making investment decisions.</p>';
             })
             .catch(error => console.error('Error fetching image:', error));
         })

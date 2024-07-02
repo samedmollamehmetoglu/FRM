@@ -11,12 +11,10 @@
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Markowitz Portfolio Optimizer</h1>
-        
         <div class="alert alert-info">
             <strong>Info:</strong> This tool allows you to optimize a portfolio of stocks using the Markowitz Modern Portfolio Theory. 
             Select at least 4 stocks and specify a date range to analyze the optimal portfolios based on different criteria.
         </div>
-
         <div id="selected-stocks" class="mb-2"></div>
         <form id="portfolio-form">
             <div class="form-group">
@@ -51,6 +49,7 @@
                         <option value="NFLX">Netflix (NFLX)</option>
                         <option value="INTC">Intel (INTC)</option>
                         <option value="CSCO">Cisco (CSCO)</option>
+                        <!-- Add more stocks as needed -->
                     </select>
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" id="add-stock-btn"><i class="fas fa-plus"></i></button>
@@ -64,12 +63,7 @@
             <div id="portfolio-table"></div>
             <div id="efficient-frontier" style="width: 100%; height: 600px;"></div>
             <div id="cumulative-plot" style="width: 100%; height: 600px;"></div>
-        </div>
-
-        <div class="alert alert-warning mt-4">
-            <strong>Disclaimer:</strong> The Markowitz Portfolio Theory assumes that returns are normally distributed and markets are efficient. 
-            It may not account for all real-world factors and risks. 
-            Users should perform their own research and consult with a financial advisor before making any investment decisions.
+            <div id="disclaimer"></div>
         </div>
     </div>
 
