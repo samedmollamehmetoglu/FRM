@@ -157,9 +157,9 @@ def calculate_equal_distribution(returns, tickers):
         plt.plot(returns.iloc[:, i].cumsum(), label=tickers[i], color=colors[i])
 
     plt.legend(loc='best')
-    plt.title('Kumulierte Summe jeder Zeitreihe')
+    plt.title('Kumulierte Summe jedes Assets')
     plt.ylabel('Kumulative tägliche Aktienrendite')
-    plt.xlabel('Tage')
+    plt.xlabel('Zeit')
     static = os.path.join(os.getcwd(), 'static')
     filename = os.path.join(static, 'cumulative_plot.png')
     plt.savefig(filename)
