@@ -38,8 +38,25 @@ document.addEventListener('DOMContentLoaded', function() {
     portfolioForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
+        const startDate = new Date(document.getElementById('start-date').value);
+        const endDate = new Date(document.getElementById('end-date').value);
+        const today = new Date();
+
+        if (startDate >= endDate) {
+            alert("Start date must be before the end date.");
+            return;
+        }
+
+        if ((endDate - startDate) / (1000 * 60 * 60 * 24 * 365) < 1) {
+            alert("The date range must be at least one year.");
+            return;
+        }
+
+        if (endDate > today || startDate > today) {
+            alert("Dates cannot be in the future.");
+            return;
+        }
+
         const selectedStocks = Array.from(selectedStocksContainer.querySelectorAll('.selected-stock')).map(stock => stock.textContent.replace(' x', '').trim().match(/\(([^)]+)\)/)[1]);
 
         const efficientFrontierContainer = document.getElementById('efficient-frontier');
@@ -56,11 +73,16 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 tickers: selectedStocks,
-                date_range: [startDate, endDate]
+                date_range: [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]]
             })
         })
         .then(response => response.json())
         .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
             const imgElement = document.createElement('img');
             imgElement.src = data.image_path;
             imgElement.alt = 'Efficient Frontier';
