@@ -9,11 +9,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <header>
+        <div class="header-left">
+            <h2 class="header">Financial Risk Management</h2>
+        </div>
+        <div class="header-right">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+        </div>
+    </header>
     <div class="container mt-5">
         <h1 class="mb-4">Markowitz Portfolio Optimizer</h1>
         <div class="alert alert-info">
             <strong>Info:</strong> This tool allows you to optimize a portfolio of stocks using the Markowitz Modern Portfolio Theory. 
-            Select at least 4 stocks and specify a date range to analyze the optimal portfolios based on different criteria.
+            Select between 4 and 10 stocks and specify a date range to analyze the optimal portfolios based on different criteria.
         </div>
         <div id="selected-stocks" class="mb-2"></div>
         <form id="portfolio-form">
@@ -56,16 +64,32 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="optimize-btn" name="action" value="optimize">Optimize</button>
+            <button type="submit" class="btn btn-primary" id="optimize" name="action" value="optimize">Optimize</button>
         </form>
         <div id="results" class="mt-5">
             <h2>Optimal Portfolio</h2>
             <div id="portfolio-table"></div>
-            <div id="efficient-frontier" style="width: 100%; height: 600px;"></div>
-            <div id="cumulative-plot" style="width: 100%; height: 600px;"></div>
+            <div class="diagram-container">
+                <div id="efficient-frontier" style="width: 100%; height: 600px;"></div>
+                <div id="efficient-frontier-description" class="diagram-description">
+                    This graph represents the efficient frontier, showing the trade-off between risk and return for different portfolio combinations.
+                    <br><br><br>
+                    This plot shows the cumulative return of the optimized portfolio over the selected time period.
+                </div>
+            </div>
+            <div class="diagram-container">
+                <div id="cumulative-plot" style="width: 100%; height: 600px; position: relative;">
+                    <div id="cumulative-plot-description" class="diagram-description">
+                        
+                    </div>
+                </div>
+            </div>
             <div id="disclaimer"></div>
         </div>
     </div>
+    <footer>
+        <p>&copy; 2024 Modern Portfolio Dashboard. All rights reserved.</p>
+    </footer>
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

@@ -3,11 +3,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedStocksContainer = document.getElementById('selected-stocks');
     const tickersSelect = document.getElementById('tickers');
     const addStockBtn = document.getElementById('add-stock-btn');
-    const optimizeBtn = document.getElementById('optimize-btn');
+    const optimizeBtn = document.getElementById('optimize');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    const efficientFrontierDescription = document.getElementById('efficient-frontier-description');
+    const cumulativePlotDescription = document.getElementById('cumulative-plot-description');
+
+    const today = new Date().toISOString().split('T')[0];
+    const minDate = '2009-01-01';
+    startDateInput.setAttribute('max', today);
+    startDateInput.setAttribute('min', minDate);
+    endDateInput.setAttribute('max', today);
+    endDateInput.setAttribute('min', minDate);
+
+    efficientFrontierDescription.style.display = 'none';
+    cumulativePlotDescription.style.display = 'none';
 
     function updateButtonsState() {
         const selectedStocks = selectedStocksContainer.querySelectorAll('.selected-stock').length;
-        optimizeBtn.disabled = selectedStocks < 4;
+        optimizeBtn.disabled = selectedStocks < 4 || selectedStocks > 10;
+        addStockBtn.disabled = selectedStocks >= 10;
+    }
+
+    function validateDates() {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        const minEndDate = new Date(startDate);
+        minEndDate.setMonth(minEndDate.getMonth() + 3);
+
+        if (startDate && endDate) {
+            if (startDate > endDate) {
+                alert('Start date must be before end date.');
+                return false;
+            } else if (endDate < minEndDate) {
+                alert('End date must be at least 3 months after the start date.');
+                return false;
+            }
+        }
+        return true;
     }
 
     addStockBtn.addEventListener('click', function() {
@@ -38,8 +71,12 @@ document.addEventListener('DOMContentLoaded', function() {
     portfolioForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
+        if (!validateDates()) {
+            return;
+        }
+
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
         const selectedStocks = Array.from(selectedStocksContainer.querySelectorAll('.selected-stock')).map(stock => stock.textContent.replace(' x', '').trim().match(/\(([^)]+)\)/)[1]);
 
         const efficientFrontierContainer = document.getElementById('efficient-frontier');
@@ -70,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
             imgElement.style.width = '100%';
             efficientFrontierContainer.innerHTML = '';
             efficientFrontierContainer.appendChild(imgElement);
+            efficientFrontierDescription.style.display = 'block';
 
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mt-4');
@@ -130,6 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 imgElement.style.width = '100%';
                 cumulativePlotContainer.innerHTML = '';
                 cumulativePlotContainer.appendChild(imgElement);
+                cumulativePlotDescription.style.display = 'block';
 
                 disclaimerContainer.innerHTML = '<p><strong>Disclaimer:</strong> The Markowitz portfolio optimization is based on historical data and assumes that past performance is indicative of future results. This method also assumes that asset returns are normally distributed, which might not always be the case in real market conditions. Investors should use these results with caution and consider other factors before making investment decisions.</p>';
             })
