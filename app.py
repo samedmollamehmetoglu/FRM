@@ -26,7 +26,7 @@ def calculate_portfolio_return_and_risk(returns):
     sigma = np.sqrt(w * cov * w.T)
     return mu.item(), sigma.item()
 
-def simulate_portfolios(returns, n_portfolios=1500):
+def simulate_portfolios(returns, n_portfolios=3000):
     pf_mus, pf_sigmas = np.column_stack([calculate_portfolio_return_and_risk(returns) for _ in range(n_portfolios)])
     return pf_mus, pf_sigmas
 
@@ -139,37 +139,6 @@ def get_max_return_portfolio(returns):
         'risk': max_return_risk
     }
 
-"""def calculate_equal_distribution(returns, tickers):
-    N = returns.shape[1]
-    weights = np.ones(N) / N
-
-    cov = np.cov(returns.T)
-    pbar = returns.mean().values.reshape(-1, 1)
-    optimal_return = np.dot(weights.T, pbar).item()
-    optimal_risk = np.sqrt(np.dot(weights.T, np.dot(cov, weights))).item()
-    max_sharpe_ratio = (optimal_return - 0.0) / optimal_risk
-    min_volatility_return = optimal_return
-    min_volatility_risk = optimal_risk
-
-    plt.figure(figsize=(10, 6))
-    colors = plt.cm.plasma(np.linspace(0, 3, 20))
-    for i in range(returns.shape[1]):
-        plt.plot(returns.iloc[:, i].cumsum(), label=tickers[i], color=colors[i])
-
-    plt.legend(loc='best')
-    plt.title('Kumulierte Summe jedes Assets')
-    plt.ylabel('Kumulative tägliche Aktienrendite')
-    plt.xlabel('Zeit')
-    static = os.path.join(os.getcwd(), 'static')
-    filename = os.path.join(static, 'cumulative_plot.png')
-    plt.savefig(filename)
-    plt.close()
-
-    return {
-        'weights': weights.tolist(),
-        'return': optimal_return,
-        'risk': optimal_risk
-    }"""
 def calculate_equal_distribution(returns, tickers):
     N = returns.shape[1]
     weights = np.ones(N) / N
@@ -200,7 +169,6 @@ def calculate_equal_distribution(returns, tickers):
         'risk': optimal_risk
     }
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -224,9 +192,9 @@ def get_efficient_frontier():
     plt.plot(pf_sigmas, pf_mus, 'o', markersize=5, label='Available Market Portfolio')
     plt.plot(optimal_sigmas, optimal_mus, 'y-o', color='orange', markersize=8, label='Efficient Frontier')
 
-    plt.scatter(min_vol_portfolio['risk'], min_vol_portfolio['return'], color='green', edgecolors='black', marker='o', s=100, label='Min Volatility',zorder=5)
-    plt.scatter(max_sharpe_portfolio['risk'], max_sharpe_portfolio['return'], color='purple', edgecolors='black', marker='o', s=100, label='Max Sharpe Ratio',zorder=5)
-    plt.scatter(max_return_portfolio['risk'], max_return_portfolio['return'], color='red', edgecolors='black', marker='o', s=100, label='Max Return',zorder=5)
+    plt.scatter(min_vol_portfolio['risk'], min_vol_portfolio['return'], color='green', edgecolors='black', marker='o', s=100, label='Min Volatility', zorder=5)
+    plt.scatter(max_sharpe_portfolio['risk'], max_sharpe_portfolio['return'], color='purple', edgecolors='black', marker='o', s=100, label='Max Sharpe Ratio', zorder=5)
+    plt.scatter(max_return_portfolio['risk'], max_return_portfolio['return'], color='red', edgecolors='black', marker='o', s=100, label='Max Return', zorder=5)
 
     plt.xlabel('Expected Volatility')
     plt.ylabel('Expected Return')

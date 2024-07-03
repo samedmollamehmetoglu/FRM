@@ -87,6 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
         portfolioTableContainer.innerHTML = '';
         cumulativePlotContainer.innerHTML = '';
         disclaimerContainer.innerHTML = '';
+        efficientFrontierDescription.style.display = 'none';
+        cumulativePlotDescription.style.display = 'none';
 
         fetch('/efficient_frontier', {
             method: 'POST',
